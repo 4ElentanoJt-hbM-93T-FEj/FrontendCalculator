@@ -10,27 +10,28 @@
   <body>
     <main>
       <p class="main__title">Давайте считать</p>
-      <input id="number" class="input__field" type="" />
-
+      <div class="input__row">
+        <input id="number" class="input__field" type="text" />
+      </div>
       <table>
         <tbody>
           <tr>
             <td><button class="clean">AC</button></td>
             <td><button class="">+/-</button></td>
             <td><button class="percent">%</button></td>
-            <td><button class="operator">/</button></td>
+            <td><button class="division operator">/</button></td>
           </tr>
           <tr>
             <td><button class="number__7">7</button></td>
             <td><button class="number__8">8</button></td>
             <td><button class="number__9">9</button></td>
-            <td><button class="operator">*</button></td>
+            <td><button class="multiplication operator">*</button></td>
           </tr>
           <tr>
             <td><button class="number__4">4</button></td>
             <td><button class="number__5">5</button></td>
             <td><button class="number__6">6</button></td>
-            <td><button class="operator">-</button></td>
+            <td><button class="subtraction operator">-</button></td>
           </tr>
           <tr>
             <td><button class="number__1">1</button></td>
@@ -41,7 +42,9 @@
           <tr>
             <td><button class="number__0">0</button></td>
             <td><button class="point">.</button></td>
-            <td><button class="equality operator">=</button></td>
+            <td class="operator__row">
+              <button class="equality operator">=</button>
+            </td>
           </tr>
         </tbody>
       </table>
