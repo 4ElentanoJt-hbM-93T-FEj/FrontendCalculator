@@ -12,6 +12,7 @@ body {
   flex-direction: column;
   align-items: center;
   background-color: #555b60;
+  /* position: relative; */
 }
 
 main {
@@ -28,13 +29,12 @@ main {
 }
 
 .input__field {
-  width: 100%;
+  width: 85%;
   height: 20%;
   padding: 5px;
   background-color: transparent;
   font-size: 8vh;
   text-align: right;
-  margin-bottom: 30px;
   border-radius: 20px;
   border: none;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
@@ -95,4 +95,18 @@ tr {
 }
 
 .input__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.backspace {
+  width: 80%;
+}
+
+.history{
+  width: 80%;
+  margin-bottom: 10px;
+  text-align: end;
 }

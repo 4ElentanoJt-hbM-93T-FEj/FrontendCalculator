@@ -11,36 +11,50 @@
     <main>
       <p class="main__title">Давайте считать</p>
       <div class="input__row">
-        <input id="number" class="input__field" type="text" />
+        <div>
+          <div class="history" id="history"></div>
+          <input id="number" class="input__field" type="text" placeholder="0" />
+        </div>
+        <button class="backspace__btn special">
+          <img
+            class="backspace"
+            src="/src/assets/images/backspace.png"
+            alt="backspace"
+          />
+        </button>
       </div>
       <table>
         <tbody>
           <tr>
-            <td><button class="clean">AC</button></td>
-            <td><button class="">+/-</button></td>
-            <td><button class="percent">%</button></td>
+            <td><button class="clean special">AC</button></td>
+            <td><button class="plus-minus special">+/-</button></td>
+            <td><button class="percent special">%</button></td>
             <td><button class="division operator">/</button></td>
           </tr>
           <tr>
-            <td><button class="number__7">7</button></td>
-            <td><button class="number__8">8</button></td>
-            <td><button class="number__9">9</button></td>
-            <td><button class="multiplication operator">*</button></td>
+            <td><button class="number-btn" data-number="7">7</button></td>
+            <td><button class="number-btn" data-number="8">8</button></td>
+            <td><button class="number-btn" data-number="9">9</button></td>
+            <td><button class="multiplication operator">×</button></td>
           </tr>
           <tr>
-            <td><button class="number__4">4</button></td>
-            <td><button class="number__5">5</button></td>
-            <td><button class="number__6">6</button></td>
+            <td><button class="number-btn" data-number="4">4</button></td>
+            <td><button class="number-btn" data-number="5">5</button></td>
+            <td><button class="number-btn" data-number="6">6</button></td>
             <td><button class="subtraction operator">-</button></td>
           </tr>
           <tr>
-            <td><button class="number__1">1</button></td>
-            <td><button class="number__2">2</button></td>
-            <td><button class="number__3">3</button></td>
+            <td><button class="number-btn" data-number="1">1</button></td>
+            <td><button class="number-btn" data-number="2">2</button></td>
+            <td><button class="number-btn" data-number="3">3</button></td>
             <td><button class="plus operator">+</button></td>
           </tr>
           <tr>
-            <td><button class="number__0">0</button></td>
+            <td>
+              <button class="number-btn" data-number="0" style="width: 155px">
+                0
+              </button>
+            </td>
             <td><button class="point">.</button></td>
             <td class="operator__row">
               <button class="equality operator">=</button>

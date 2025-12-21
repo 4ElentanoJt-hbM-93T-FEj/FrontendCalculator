@@ -1,59 +1,267 @@
 "use strict";
 
-const inputNumber = document.querySelector(".input__field");
+class Calculator {
+  constructor() {
+    this.input = document.getElementById("number");
+    this.history = document.getElementById("history");
+    this.currentInput = "";
+    this.previousInput = "";
+    this.operator = null;
+    this.waitingForNewInput = false;
+    this.initialize();
+  }
 
-const operatorsList = new Object({
-  plus: "+",
-  subtraction: "-",
-  division: "/",
-  multiplication: "*",
-});
+  initialize() {
+    // Очистка
+    document
+      .querySelector(".clean")
+      .addEventListener("click", () => this.clear());
 
-//? Добавляем свой метод в прототип строк!
-String.prototype.replaceAt = function (index, char) {
-  return (
-    this.substring(0, index) + char + this.substring(index + 1, this.length)
-  );
-};
+    // Процент
+    document
+      .querySelector(".percent")
+      .addEventListener("click", () => this.percent());
 
-//? Очистка поля
-document.querySelector(".clean").addEventListener("click", () => {
-  inputNumber.value = "0";
-});
+    // Смена знака
+    document
+      .querySelector(".plus-minus")
+      .addEventListener("click", () => this.toggleSign());
 
-for (const item in operatorsList) {
-  document.querySelector(`.${item}`).addEventListener("click", () => {
-    addOperator(operatorsList[item]);
-  });
-}
+    // Точка
+    document
+      .querySelector(".point")
+      .addEventListener("click", () => this.addDecimal());
 
-function addOperator(operator = "") {
-  if (
-    !Object.values(operatorsList).includes(
-      inputNumber.value[inputNumber.value.length - 1]
+    // Удаление последнего символа
+    document
+      .querySelector(".backspace__btn")
+      .addEventListener("click", () => this.backspace());
+
+    // Равно
+    document
+      .querySelector(".equality")
+      .addEventListener("click", () => this.calculate());
+
+    // Обработчики для цифр
+    document.querySelectorAll(".number-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        const number = button.getAttribute("data-number");
+        this.appendNumber(number);
+      });
+    });
+
+    // Обработчики для операторов
+    document.querySelectorAll(".operator:not(.equality)").forEach((button) => {
+      button.addEventListener("click", () => {
+        const operation = this.getOperationFromButton(button);
+        this.setOperation(operation);
+      });
+    });
+
+    // Обработка ввода с клавиатуры
+    this.input.addEventListener("keydown", (e) => this.handleKeyboardInput(e));
+  }
+
+  appendNumber(number) {
+    if (this.waitingForNewInput) {
+      this.currentInput = "";
+      this.waitingForNewInput = false;
+    }
+
+    if (this.currentInput.length >= 15) return; // Ограничение длины
+
+    if (number === "0" && this.currentInput === "0") return;
+    if (number !== "0" && this.currentInput === "0") {
+      this.currentInput = "";
+    }
+
+    this.currentInput += number;
+    this.updateDisplay();
+  }
+
+  addDecimal() {
+    if (this.waitingForNewInput) {
+      this.currentInput = "0.";
+      this.waitingForNewInput = false;
+    } else if (this.currentInput === "") {
+      this.currentInput = "0.";
+    } else if (!this.currentInput.includes(".")) {
+      this.currentInput += ".";
+    }
+    this.updateDisplay();
+  }
+
+  setOperation(operation) {
+    if (this.currentInput === "") return;
+
+    if (
+      this.previousInput !== "" &&
+      this.operator &&
+      !this.waitingForNewInput
+    ) {
+      this.calculate();
+    }
+
+    this.operator = operation;
+    this.previousInput = this.currentInput;
+    this.waitingForNewInput = true;
+
+    // Отображение истории
+    this.history.textContent = `${this.previousInput} ${this.operator}`;
+  }
+
+  calculate() {
+    if (
+      this.operator === null ||
+      this.previousInput === "" ||
+      this.currentInput === ""
     )
-  ) {
-    inputNumber.value += operator;
-  } else {
-    inputNumber.value = inputNumber.value.replaceAt(
-      inputNumber.value.length - 1,
-      operator
-    );
+      return;
+
+    const prev = parseFloat(this.previousInput);
+    const current = parseFloat(this.currentInput);
+    let result;
+
+    switch (this.operator) {
+      case "+":
+        result = prev + current;
+        break;
+      case "-":
+        result = prev - current;
+        break;
+      case "×":
+        result = prev * current;
+        break;
+      case "/":
+        if (current === 0) {
+          this.showError("Деление на ноль!");
+          return;
+        }
+        result = prev / current;
+        break;
+      default:
+        return;
+    }
+
+    // Округление для избежания ошибок с плавающей точкой
+    result = Math.round(result * 100000000) / 100000000;
+
+    this.currentInput = result.toString();
+    this.history.textContent = `${this.previousInput} ${this.operator} ${current} =`;
+    this.previousInput = "";
+    this.operator = null;
+    this.waitingForNewInput = true;
+    this.updateDisplay();
+  }
+
+  percent() {
+    if (this.currentInput === "") return;
+
+    const current = parseFloat(this.currentInput);
+    this.currentInput = (current / 100).toString();
+    this.updateDisplay();
+  }
+
+  toggleSign() {
+    if (this.currentInput === "" || this.currentInput === "0") return;
+
+    if (this.currentInput.startsWith("-")) {
+      this.currentInput = this.currentInput.substring(1);
+    } else {
+      this.currentInput = "-" + this.currentInput;
+    }
+    this.updateDisplay();
+  }
+
+  clear() {
+    this.currentInput = "";
+    this.previousInput = "";
+    this.operator = null;
+    this.waitingForNewInput = false;
+    this.history.textContent = "";
+    this.updateDisplay();
+  }
+
+  backspace() {
+    if (this.currentInput.length > 0) {
+      this.currentInput = this.currentInput.slice(0, -1);
+      this.updateDisplay();
+    }
+  }
+
+  updateDisplay() {
+    if (this.currentInput === "" || this.currentInput === "-") {
+      this.input.value = "0";
+    } else {
+      // Форматирование числа с разделителями тысяч
+      const num = parseFloat(this.currentInput);
+      if (!isNaN(num)) {
+        this.input.value = num.toLocaleString("ru-RU", {
+          maximumFractionDigits: 8,
+        });
+      } else {
+        this.input.value = this.currentInput;
+      }
+    }
+  }
+
+  getOperationFromButton(button) {
+    const text = button.textContent;
+    switch (text) {
+      case "+":
+        return "+";
+      case "-":
+        return "-";
+      case "×":
+        return "×";
+      case "/":
+        return "/";
+      default:
+        return text;
+    }
+  }
+
+  showError(message) {
+    this.input.value = message;
+    this.currentInput = "";
+    this.previousInput = "";
+    this.operator = null;
+    this.waitingForNewInput = false;
+    this.history.textContent = "";
+
+    setTimeout(() => {
+      this.clear();
+    }, 1500);
+  }
+
+  handleKeyboardInput(e) {
+    const key = e.key;
+
+    if (key >= "0" && key <= "9") {
+      this.appendNumber(key);
+    } else if (key === ".") {
+      this.addDecimal();
+    } else if (key === "+") {
+      this.setOperation("+");
+    } else if (key === "-") {
+      this.setOperation("-");
+    } else if (key === "*") {
+      this.setOperation("×");
+    } else if (key === "/") {
+      e.preventDefault();
+      this.setOperation("/");
+    } else if (key === "Enter" || key === "=") {
+      e.preventDefault();
+      this.calculate();
+    } else if (key === "Escape") {
+      this.clear();
+    } else if (key === "Backspace") {
+      this.backspace();
+    } else if (key === "%") {
+      this.percent();
+    }
   }
 }
 
-document.querySelector(".percent").addEventListener("click", () => {
-  //   inputNumber.value %= +inputNumber.value;
-});
-
-document.querySelector(".point").addEventListener("click", () => {
-  //   inputNumber.value += parseFloat(inputNumber.value);
-});
-
-// add number click event behavior
-for (let index = 0; index <= 9; index++) {
-  document.querySelector(`.number__${index}`).addEventListener("click", () => {
-    if (inputNumber[inputNumber.value.length - 1] === "0")
-      inputNumber.value += index;
-  });
-}
+// Инициализация калькулятора
+new Calculator();
